@@ -3,32 +3,32 @@
 16分トリルパターン設計
 2小節毎に異なる組み合わせで配置
 """
+import random
+import itertools
 
-def generate_trill_patterns():
-    """16分トリルの基本パターンを生成"""
-    patterns = [
-        # パターン1: 1-2トリル
-        [(1, 2), (2, 1), (1, 2), (2, 1)],
-        # パターン2: 2-3トリル  
-        [(2, 3), (3, 2), (2, 3), (3, 2)],
-        # パターン3: 3-4トリル
-        [(3, 4), (4, 3), (3, 4), (4, 3)],
-        # パターン4: 4-5トリル
-        [(4, 5), (5, 4), (4, 5), (5, 4)],
-        # パターン5: 5-6トリル
-        [(5, 6), (6, 5), (5, 6), (6, 5)],
-        # パターン6: 6-7トリル
-        [(6, 7), (7, 6), (6, 7), (7, 6)],
-        # パターン7: 1-3トリル (飛び)
-        [(1, 3), (3, 1), (1, 3), (3, 1)],
-        # パターン8: 2-4トリル (飛び)
-        [(2, 4), (4, 2), (2, 4), (4, 2)],
-        # パターン9: 3-5トリル (飛び)
-        [(3, 5), (5, 3), (3, 5), (5, 3)],
-        # パターン10: 4-6トリル (飛び)
-        [(4, 6), (6, 4), (4, 6), (6, 4)],
-    ]
-    return patterns
+def trill_pattern_generator():
+    """トリルパターンを無限に生成するジェネレータ"""
+    # 利用可能なレーン（1-7）
+    available_lanes = list(range(1, 8))
+    used_patterns = []
+    
+    # 可能な全ての2つのレーンの組み合わせを生成
+    all_combinations = list(itertools.combinations(available_lanes, 2))
+    
+    while True:
+        # 使用済みパターンを除外した候補を作成
+        candidates = [combo for combo in all_combinations if combo not in used_patterns]
+        
+        # 候補がない場合は使用済みパターンをリセット
+        if not candidates:
+            used_patterns = []
+            candidates = all_combinations.copy()
+        
+        # ランダムに選択
+        selected = random.choice(candidates)
+        used_patterns.append(selected)
+        
+        yield selected
 
 def generate_bmson_notes(bpm, duration_minutes=2):
     """BMSONノート配列を生成"""
@@ -36,23 +36,26 @@ def generate_bmson_notes(bpm, duration_minutes=2):
     beats_per_measure = 4
     measures_per_pattern = 2
     
-    # 2分間の総拍数
+    # 2分を超えるまで2小節単位で生成
+    # 2分間の総拍数を計算し、2小節単位に切り上げ
     total_beats = bpm * duration_minutes * 2
     total_measures = total_beats // beats_per_measure
+    # 2小節単位に切り上げ
+    if total_measures % measures_per_pattern != 0:
+        total_measures = ((total_measures // measures_per_pattern) + 1) * measures_per_pattern
     
-    patterns = generate_trill_patterns()
+    pattern_gen = trill_pattern_generator()
     notes = []
     scratch_notes = []
     metronome_notes = []
     
     current_y = 0
-    pattern_index = 0
+    current_pattern = None
     
     for measure in range(total_measures):
         # 2小節毎にパターン変更
         if measure % measures_per_pattern == 0:
-            current_pattern = patterns[pattern_index % len(patterns)]
-            pattern_index += 1
+            current_pattern = next(pattern_gen)
         
         # 各小節の16分音符配置
         for beat in range(beats_per_measure):
@@ -69,10 +72,10 @@ def generate_bmson_notes(bpm, duration_minutes=2):
             # 16分音符のトリル配置
             for sixteenth in range(4):
                 note_y = beat_y + (sixteenth * resolution // 4)
-                trill_index = sixteenth % len(current_pattern)
-                lane1, lane2 = current_pattern[trill_index]
+                # トリルの2つのレーンを交互に配置
+                lane1, lane2 = current_pattern
                 
-                # 交互にノート配置
+                # 16分音符ごとに交互配置
                 if sixteenth % 2 == 0:
                     notes.append({
                         "x": lane1,
@@ -104,7 +107,8 @@ def generate_bmson_notes(bpm, duration_minutes=2):
 
 if __name__ == "__main__":
     # テスト実行
-    patterns = generate_trill_patterns()
-    print(f"Generated {len(patterns)} trill patterns")
-    for i, pattern in enumerate(patterns):
-        print(f"Pattern {i+1}: {pattern}")
+    gen = trill_pattern_generator()
+    print("Generating trill patterns:")
+    for i in range(10):
+        pattern = next(gen)
+        print(f"Pattern {i+1}: {pattern[0]}-{pattern[1]}")

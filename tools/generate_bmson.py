@@ -73,7 +73,7 @@ def generate_all_difficulties():
     
     for bpm, difficulty, level in difficulties:
         bmson = create_bmson(bpm, difficulty, level)
-        filename = f"charts/trill_practice_{difficulty}_bpm{bpm}.bmson"
+        filename = f"trill_practice_{difficulty}_bpm{bpm}.bmson"
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(bmson, f, indent=2, ensure_ascii=False)
