@@ -59,18 +59,19 @@ def create_stair_bmson(bpm, difficulty, level, include_scratch=False, include_tr
     
     resolution = 240
     beats_per_measure = 4
-    duration_minutes = 2
+    duration_minutes = 5
     
-    # 総小節数（2分を超えるまで2小節単位）
-    total_beats = int(bpm * duration_minutes * 2)
+    # 総小節数（5分を超えるまで2小節単位）
+    total_beats = int(bpm * duration_minutes)
     total_measures = total_beats // beats_per_measure
     if total_measures % 2 != 0:
         total_measures += 1
     
+    # パス1: 階段ノートを生成
     current_y = 0
     current_pattern = None
     pattern_position = 0
-    recent_lanes = []  # 過去3世代のレーンを記録
+    stair_notes = []  # 階段ノートの位置を記録
     
     for measure in range(total_measures):
         # パターンが終了したら次のパターンを取得
@@ -91,26 +92,8 @@ def create_stair_bmson(bpm, difficulty, level, include_scratch=False, include_tr
                     "l": 0,
                     "c": False
                 })
-                
-                # 最近のレーンを記録（最大3つ）
-                recent_lanes.append(lane)
-                if len(recent_lanes) > 3:
-                    recent_lanes.pop(0)
-                
+                stair_notes.append((note_y, lane))
                 pattern_position += 1
-            
-            # ゴミノート（4分音符）
-            if include_trash and i % 4 == 2 and recent_lanes:
-                # 過去3世代のレーンを除外した候補を作成
-                available_lanes = [x for x in range(1, 8) if x not in recent_lanes]
-                if available_lanes:
-                    trash_lane = random.choice(available_lanes)
-                    bmson["sound_channels"][0]["notes"].append({
-                        "x": trash_lane,
-                        "y": note_y,
-                        "l": 0,
-                        "c": False
-                    })
             
             # メトロノーム（4分音符）
             if i % 4 == 0:
@@ -131,6 +114,36 @@ def create_stair_bmson(bpm, difficulty, level, include_scratch=False, include_tr
                     })
         
         current_y += beats_per_measure * resolution
+    
+    # パス2: ゴミノートを追加
+    if include_trash:
+        for i, (y, lane) in enumerate(stair_notes):
+            # 4分音符の位置（16分音符の2つおき）でゴミを配置
+            if (y % resolution) == (resolution // 2):  # 2拍目と4拍目
+                # 過去3つと未来2つのノートを確認
+                excluded_lanes = set()
+                
+                # 過去3つ
+                for j in range(max(0, i-3), i):
+                    excluded_lanes.add(stair_notes[j][1])
+                
+                # 現在
+                excluded_lanes.add(lane)
+                
+                # 未来2つ
+                for j in range(i+1, min(i+3, len(stair_notes))):
+                    excluded_lanes.add(stair_notes[j][1])
+                
+                # 利用可能なレーンから選択
+                available_lanes = [x for x in range(1, 8) if x not in excluded_lanes]
+                if available_lanes:
+                    trash_lane = random.choice(available_lanes)
+                    bmson["sound_channels"][0]["notes"].append({
+                        "x": trash_lane,
+                        "y": y,
+                        "l": 0,
+                        "c": False
+                    })
     
     return bmson
 
