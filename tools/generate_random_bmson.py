@@ -69,26 +69,28 @@ def create_random_bmson(bpm, chord_sizes, pattern_name, scratch_interval=None, s
 
 def generate_all_patterns():
     """全パターンのBMSONファイルを生成"""
-    bpms = range(80, 280, 20)  # 80-260を20刻み
+    bpms = range(100, 240, 20)  # 100-220を20刻み
     
     pattern_configs = [
         ([1], "単一鍵盤乱打", "single"),
         ([1, 2], "単一〜2鍵同時押し乱打", "single_to_2"),
         ([1, 2, 3], "単一〜3鍵同時押し乱打", "single_to_3"),
-        ([2, 3], "2〜3鍵同時押し乱打", "2_to_3"),
-        ([3], "3鍵同時押し乱打", "triple"),
-        ([3, 4], "3〜4鍵同時押し乱打", "3_to_4")
+        ([1, 2, 3, 4], "単一〜4鍵同時押し乱打", "single_to_4")
     ]
     
     scratch_configs = [
         (None, 1.0, ""),
         (4, 1.0, "_4th_scratch"),
-        (8, 0.25, "_8th_scratch_25"),
-        (16, 0.125, "_16th_scratch_12.5")
+        (8, 0.5, "_8th_scratch_50"),
+        (16, 0.25, "_16th_scratch_25")
     ]
     
     for chord_sizes, pattern_name, filename_suffix in pattern_configs:
         for scratch_interval, scratch_probability, scratch_suffix in scratch_configs:
+            # 8分皿と16分皿は[1]と[1,2]のみ
+            if scratch_interval in [8, 16] and chord_sizes not in [[1], [1, 2]]:
+                continue
+                
             if scratch_interval:
                 interval_name = f"{scratch_interval}分" if scratch_interval == 4 else f"{scratch_interval}分"
                 prob_text = f"{int(scratch_probability*100)}%" if scratch_probability < 1.0 else ""

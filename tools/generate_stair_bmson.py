@@ -162,7 +162,7 @@ def create_stair_bmson(bpm, include_scratch=False, include_trash=False, trash_ty
 
 def generate_stair_difficulties():
     """全BPMの階段譜面を生成"""
-    bpms = range(80, 280, 20)  # 80-260を20刻み
+    bpms = range(100, 240, 20)  # 100-220を20刻み
     
     # 階段のみ
     print("=== 階段のみバージョン ===")

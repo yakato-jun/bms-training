@@ -12,9 +12,7 @@ class RandomPatternGenerator:
         - [1]: 単一鍵盤乱打
         - [1, 2]: 単一〜2鍵同時押し乱打
         - [1, 2, 3]: 単一〜3鍵同時押し乱打
-        - [2, 3]: 2〜3鍵同時押し乱打
-        - [3]: 3鍵同時押し乱打
-        - [3, 4]: 3〜4鍵同時押し乱打
+        - [1, 2, 3, 4]: 単一〜4鍵同時押し乱打
         """
         self.chord_sizes = chord_sizes
         self.recent_notes = []  # 最近のノート履歴
@@ -77,6 +75,9 @@ class RandomPatternGenerator:
                     chord_size = random.choice(self.chord_sizes)
                     
                     # 縦連禁止の制約を適用
+                    # N=1,2: 完全に縦連禁止
+                    # N=3: 1つまで縦連OK
+                    # N=4: 2つまで縦連OK
                     allowed_repeat = max(0, chord_size - 2)
                     
                     # 利用可能なレーンを決定
@@ -85,11 +86,19 @@ class RandomPatternGenerator:
                     # 最近のノートから縦連を避ける
                     if self.recent_notes:
                         last_chord = self.recent_notes[-1]
-                        # 縦連として許可される数を超えないようにする
-                        forbidden_lanes = []
-                        for lane in last_chord:
-                            if last_chord.count(lane) > allowed_repeat:
-                                forbidden_lanes.append(lane)
+                        
+                        # 縦連を避けるべきレーンを特定
+                        if allowed_repeat == 0:
+                            # 完全に縦連禁止（N=1,2の場合）
+                            forbidden_lanes = last_chord
+                        else:
+                            # 一部縦連OK（N=3,4の場合）
+                            # ランダムに縦連を許可するレーンを選択
+                            if len(last_chord) > allowed_repeat:
+                                allowed_lanes = random.sample(last_chord, allowed_repeat)
+                                forbidden_lanes = [lane for lane in last_chord if lane not in allowed_lanes]
+                            else:
+                                forbidden_lanes = []
                         
                         # 禁止レーンを除外
                         available_lanes = [lane for lane in available_lanes if lane not in forbidden_lanes]
@@ -128,9 +137,7 @@ def test_patterns():
         ([1], "単一鍵盤乱打"),
         ([1, 2], "単一〜2鍵同時押し乱打"),
         ([1, 2, 3], "単一〜3鍵同時押し乱打"),
-        ([2, 3], "2〜3鍵同時押し乱打"),
-        ([3], "3鍵同時押し乱打"),
-        ([3, 4], "3〜4鍵同時押し乱打")
+        ([1, 2, 3, 4], "単一〜4鍵同時押し乱打")
     ]
     
     print("乱打パターンテスト（1小節分を表示）\n")

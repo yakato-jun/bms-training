@@ -138,7 +138,7 @@ def create_bmson(bpm, include_scratch=False, include_trash=False, trash_type="4t
 
 def generate_all_difficulties():
     """全BPMのBMSONファイルを生成"""
-    bpms = range(80, 280, 20)  # 80-260を20刻み
+    bpms = range(100, 240, 20)  # 100-220を20刻み
     
     # トリルのみ
     print("=== トリルのみバージョン ===")
