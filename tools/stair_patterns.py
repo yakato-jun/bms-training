@@ -9,6 +9,7 @@ class StairPatternGenerator:
     def __init__(self, use_rest=False):
         self.use_rest = use_rest
         self.used_patterns = []
+        self.last_note = None  # 最後のノートを記録
         
     def pattern_generator(self):
         """階段パターンを無限に生成するジェネレータ"""
@@ -36,26 +37,39 @@ class StairPatternGenerator:
             self.used_patterns.append(pattern_type)
             
             # パターンを生成
+            pattern = None
             if pattern_type == "4_stairs_repeat":
-                yield self._generate_repeat_stairs(4)
+                pattern = self._generate_repeat_stairs(4)
             elif pattern_type == "5_stairs_repeat":
-                yield self._generate_repeat_stairs(5)
+                pattern = self._generate_repeat_stairs(5)
             elif pattern_type == "6_stairs_repeat":
-                yield self._generate_repeat_stairs(6)
+                pattern = self._generate_repeat_stairs(6)
             elif pattern_type == "large_stair":
-                yield self._generate_large_stair()
+                pattern = self._generate_large_stair()
             elif pattern_type == "spiral_4":
-                yield self._generate_spiral_stairs(4)
+                pattern = self._generate_spiral_stairs(4)
             elif pattern_type == "spiral_5":
-                yield self._generate_spiral_stairs(5)
+                pattern = self._generate_spiral_stairs(5)
             elif pattern_type == "spiral_6":
-                yield self._generate_spiral_stairs(6)
+                pattern = self._generate_spiral_stairs(6)
             elif pattern_type == "spiral_large":
-                yield self._generate_spiral_large()
+                pattern = self._generate_spiral_large()
             elif pattern_type == "slide_4_stairs":
-                yield self._generate_slide_stairs(4)
+                pattern = self._generate_slide_stairs(4)
             elif pattern_type == "slide_5_stairs":
-                yield self._generate_slide_stairs(5)
+                pattern = self._generate_slide_stairs(5)
+            
+            # 縦連チェック：最初の音が前のパターンの最後の音と同じ場合は調整
+            if pattern and self.last_note is not None:
+                if pattern['notes'][0] == self.last_note:
+                    # 最初の音を削除
+                    pattern['notes'].pop(0)
+            
+            # 最後の音を記録
+            if pattern and pattern['notes']:
+                self.last_note = pattern['notes'][-1]
+            
+            yield pattern
     
     def _generate_repeat_stairs(self, width):
         """同じ位置で繰り返す階段"""
