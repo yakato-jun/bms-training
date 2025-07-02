@@ -9,7 +9,7 @@ import json
 import random
 from stair_patterns import StairPatternGenerator
 
-def create_stair_bmson(bpm, include_scratch=False, include_trash=False, trash_type="4th"):
+def create_stair_bmson(bpm, difficulty_name, include_scratch=False, include_trash=False, trash_type="4th"):
     """階段練習用BMSONを生成"""
     
     # 基本情報
@@ -26,10 +26,11 @@ def create_stair_bmson(bpm, include_scratch=False, include_trash=False, trash_ty
         "version": "1.0.0",
         "info": {
             "title": title_base,
+            "subtitle": f"BPM{bpm}",
             "artist": "jun",
             "genre": "Practice",
             "mode_hint": "beat-7k",
-            "chart_name": f"BPM{bpm}",
+            "chart_name": difficulty_name,
             "level": 10,
             "judge_rank": 100,
             "total": 100.0,
@@ -161,13 +162,19 @@ def create_stair_bmson(bpm, include_scratch=False, include_trash=False, trash_ty
 
 def generate_stair_difficulties():
     """全難易度の階段譜面を生成"""
-    bpms = [120, 140, 160, 180, 200]
+    difficulties = [
+        (120, "P", "practice"),
+        (140, "N", "normal"),
+        (160, "H", "hyper"),
+        (180, "A", "another"),
+        (200, "I", "insane")
+    ]
     
     # 階段のみ
     print("=== 階段のみバージョン ===")
-    for bpm in bpms:
-        bmson = create_stair_bmson(bpm, include_scratch=False, include_trash=False)
-        filename = f"stair_practice_bpm{bpm}.bmson"
+    for bpm, difficulty_name, filename_suffix in difficulties:
+        bmson = create_stair_bmson(bpm, difficulty_name, include_scratch=False, include_trash=False)
+        filename = f"stair_practice_{filename_suffix}.bmson"
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(bmson, f, indent=2, ensure_ascii=False)
@@ -176,9 +183,9 @@ def generate_stair_difficulties():
     
     # 階段＋4分皿
     print("\n=== 階段＋4分皿バージョン ===")
-    for bpm in bpms:
-        bmson = create_stair_bmson(bpm, include_scratch=True, include_trash=False)
-        filename = f"stair_scratch_practice_bpm{bpm}.bmson"
+    for bpm, difficulty_name, filename_suffix in difficulties:
+        bmson = create_stair_bmson(bpm, difficulty_name, include_scratch=True, include_trash=False)
+        filename = f"stair_scratch_practice_{filename_suffix}.bmson"
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(bmson, f, indent=2, ensure_ascii=False)
@@ -187,9 +194,9 @@ def generate_stair_difficulties():
     
     # 階段＋4分ゴミ
     print("\n=== 階段＋4分ゴミバージョン ===")
-    for bpm in bpms:
-        bmson = create_stair_bmson(bpm, include_scratch=False, include_trash=True, trash_type="4th")
-        filename = f"stair_trash_4th_practice_bpm{bpm}.bmson"
+    for bpm, difficulty_name, filename_suffix in difficulties:
+        bmson = create_stair_bmson(bpm, difficulty_name, include_scratch=False, include_trash=True, trash_type="4th")
+        filename = f"stair_trash_4th_practice_{filename_suffix}.bmson"
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(bmson, f, indent=2, ensure_ascii=False)
@@ -198,9 +205,9 @@ def generate_stair_difficulties():
     
     # 階段＋8分ゴミ
     print("\n=== 階段＋8分ゴミバージョン ===")
-    for bpm in bpms:
-        bmson = create_stair_bmson(bpm, include_scratch=False, include_trash=True, trash_type="8th")
-        filename = f"stair_trash_8th_practice_bpm{bpm}.bmson"
+    for bpm, difficulty_name, filename_suffix in difficulties:
+        bmson = create_stair_bmson(bpm, difficulty_name, include_scratch=False, include_trash=True, trash_type="8th")
+        filename = f"stair_trash_8th_practice_{filename_suffix}.bmson"
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(bmson, f, indent=2, ensure_ascii=False)

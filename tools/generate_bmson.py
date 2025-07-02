@@ -5,7 +5,7 @@ BMSON生成スクリプト
 import json
 from trill_patterns import generate_bmson_notes
 
-def create_bmson(bpm):
+def create_bmson(bpm, difficulty_name):
     """BMSON形式のデータを生成"""
     notes, scratch_notes, metronome_notes = generate_bmson_notes(bpm, 2)
     
@@ -13,12 +13,12 @@ def create_bmson(bpm):
         "version": "1.0.0",
         "info": {
             "title": "16分トリル練習",
-            "subtitle": "",
+            "subtitle": f"BPM{bpm}",
             "artist": "jun",
             "subartists": [],
             "genre": "Practice",
             "mode_hint": "beat-7k",
-            "chart_name": f"BPM{bpm}",
+            "chart_name": difficulty_name,
             "level": 10,
             "init_bpm": float(bpm),
             "judge_rank": 100,
@@ -63,11 +63,17 @@ def create_bmson(bpm):
 
 def generate_all_difficulties():
     """全難易度のBMSONファイルを生成"""
-    bpms = [120, 140, 160, 180, 200]
+    difficulties = [
+        (120, "P", "practice"),
+        (140, "N", "normal"),
+        (160, "H", "hyper"),
+        (180, "A", "another"),
+        (200, "I", "insane")
+    ]
     
-    for bpm in bpms:
-        bmson = create_bmson(bpm)
-        filename = f"trill_practice_bpm{bpm}.bmson"
+    for bpm, difficulty_name, filename_suffix in difficulties:
+        bmson = create_bmson(bpm, difficulty_name)
+        filename = f"trill_practice_{filename_suffix}.bmson"
         
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(bmson, f, indent=2, ensure_ascii=False)
