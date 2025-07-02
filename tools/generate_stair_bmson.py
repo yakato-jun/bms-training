@@ -3,6 +3,7 @@
 階段練習用BMSON生成
 - 階段のみバージョン
 - 階段＋4分皿バージョン
+- 階段＋4分ゴミバージョン（過去3世代除外）
 """
 import json
 import random
@@ -69,7 +70,7 @@ def create_stair_bmson(bpm, difficulty, level, include_scratch=False, include_tr
     current_y = 0
     current_pattern = None
     pattern_position = 0
-    recent_lanes = []  # 過去2世代のレーンを記録
+    recent_lanes = []  # 過去3世代のレーンを記録
     
     for measure in range(total_measures):
         # パターンが終了したら次のパターンを取得
@@ -91,16 +92,16 @@ def create_stair_bmson(bpm, difficulty, level, include_scratch=False, include_tr
                     "c": False
                 })
                 
-                # 最近のレーンを記録（最大2つ）
+                # 最近のレーンを記録（最大3つ）
                 recent_lanes.append(lane)
-                if len(recent_lanes) > 2:
+                if len(recent_lanes) > 3:
                     recent_lanes.pop(0)
                 
                 pattern_position += 1
             
-            # ゴミノート（8分音符）
-            if include_trash and i % 2 == 1 and recent_lanes:
-                # 過去2世代のレーンを除外した候補を作成
+            # ゴミノート（4分音符）
+            if include_trash and i % 4 == 2 and recent_lanes:
+                # 過去3世代のレーンを除外した候補を作成
                 available_lanes = [x for x in range(1, 8) if x not in recent_lanes]
                 if available_lanes:
                     trash_lane = random.choice(available_lanes)
@@ -165,8 +166,8 @@ def generate_stair_difficulties():
         
         print(f"Generated: {filename}")
     
-    # 階段＋8分ゴミ
-    print("\n=== 階段＋8分ゴミバージョン ===")
+    # 階段＋4分ゴミ
+    print("\n=== 階段＋4分ゴミバージョン ===")
     for bpm, difficulty, level in difficulties:
         bmson = create_stair_bmson(bpm, difficulty, level, include_scratch=False, include_trash=True)
         filename = f"stair_trash_practice_{difficulty}_bpm{bpm}.bmson"
