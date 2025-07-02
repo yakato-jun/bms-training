@@ -12,9 +12,9 @@ def create_bmson(bpm, difficulty, level):
     bmson = {
         "version": "1.0.0",
         "info": {
-            "title": "16th Trill Practice",
+            "title": "16分トリル練習",
             "subtitle": f"BPM {bpm}",
-            "artist": "Claude",
+            "artist": "jun",
             "subartists": [],
             "genre": "Practice",
             "mode_hint": "beat-7k",

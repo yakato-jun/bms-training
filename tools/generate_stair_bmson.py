@@ -14,17 +14,17 @@ def create_stair_bmson(bpm, difficulty, level, include_scratch=False, include_tr
     
     # 基本情報
     if include_trash:
-        title_base = "Stair+Trash Practice"
+        title_base = "階段＋ゴミ練習"
     elif include_scratch:
-        title_base = "Stair+Scratch Practice"
+        title_base = "階段＋皿練習"
     else:
-        title_base = "Stair Practice"
+        title_base = "階段練習"
     
     bmson = {
         "version": "1.0.0",
         "info": {
             "title": f"{title_base} {difficulty.upper()} BPM{bpm}",
-            "artist": "BMS Training Tool",
+            "artist": "jun",
             "genre": "Practice",
             "mode_hint": "beat-7k",
             "chart_name": difficulty,
