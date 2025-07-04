@@ -38,7 +38,7 @@ def generate_bmson_notes(bpm, duration_minutes=2):
     
     # 2分を超えるまで2小節単位で生成
     # 2分間の総拍数を計算し、2小節単位に切り上げ
-    total_beats = bpm * duration_minutes * 2
+    total_beats = bpm * duration_minutes
     total_measures = total_beats // beats_per_measure
     # 2小節単位に切り上げ
     if total_measures % measures_per_pattern != 0:

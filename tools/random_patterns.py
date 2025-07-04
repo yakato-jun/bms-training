@@ -75,10 +75,14 @@ class RandomPatternGenerator:
                     chord_size = random.choice(self.chord_sizes)
                     
                     # 縦連禁止の制約を適用
-                    # N=1,2: 完全に縦連禁止
-                    # N=3: 1つまで縦連OK
-                    # N=4: 2つまで縦連OK
-                    allowed_repeat = max(0, chord_size - 2)
+                    # 前の同時押し数 + 今回の同時押し数が6以上で縦連を許可
+                    # 6以上: 1つ許可、7以上: 2つ許可、8以上: 3つ許可...
+                    if self.recent_notes:
+                        prev_chord_size = len(self.recent_notes[-1])
+                        total_size = prev_chord_size + chord_size
+                        allowed_repeat = max(0, total_size - 5)
+                    else:
+                        allowed_repeat = 0
                     
                     # 利用可能なレーンを決定
                     available_lanes = list(range(1, 8))
