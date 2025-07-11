@@ -69,18 +69,23 @@ def create_random_bmson(bpm, chord_sizes, pattern_name, scratch_interval=None, s
 
 def generate_all_patterns():
     """全パターンのBMSONファイルを生成"""
-    bpms = range(100, 240, 20)  # 100-220を20刻み
+    bpms = range(100, 260, 20)  # 100-240を20刻み
     
     pattern_configs = [
-        ([1], "単一鍵盤乱打", "single"),
-        ([1, 2], "単一〜2鍵同時押し乱打", "single_to_2"),
-        ([1, 2, 3], "単一〜3鍵同時押し乱打", "single_to_3"),
-        ([1, 2, 3, 4], "単一〜4鍵同時押し乱打", "single_to_4")
+        ([1], "01_[1]乱打", "1_random"),
+        ([1, 2], "02_[1, 2]乱打", "1_2_random"),
+        ([1, 2, 2], "03_[1, 2, 2]乱打", "1_2_2_random"),
+        ([1, 1, 2, 2, 3], "04_[1, 1, 2, 2, 3]乱打", "1_1_2_2_3_random"),
+        ([1, 2, 3], "05_[1, 2, 3]乱打", "1_2_3_random"),
+        ([1, 1, 1, 2, 2, 2, 3, 4], "06_[1, 1, 1, 2, 2, 2, 3, 4]乱打", "1_1_1_2_2_2_3_4_random"),
+        ([1, 1, 1, 1, 2, 2, 2, 3, 3, 4], "07_[1, 1, 1, 2, 2, 2, 3, 3, 4]乱打", "1_1_1_2_2_2_3_3_4_random"),
+        ([1, 2, 3, 4], "08_[1, 2, 3, 4]乱打", "1_2_3_4_random")
     ]
     
     scratch_configs = [
         (None, 1.0, ""),
         (4, 1.0, "_4th_scratch"),
+        (8, 0.25, "_8th_scratch_25"),
         (8, 0.5, "_8th_scratch_50"),
         (16, 0.25, "_16th_scratch_25")
     ]
@@ -88,7 +93,7 @@ def generate_all_patterns():
     for chord_sizes, pattern_name, filename_suffix in pattern_configs:
         for scratch_interval, scratch_probability, scratch_suffix in scratch_configs:
             # 8分皿と16分皿は[1]と[1,2]のみ
-            if scratch_interval in [8, 16] and chord_sizes not in [[1], [1, 2]]:
+            if scratch_interval in [8, 16] and chord_sizes not in [[1], [1, 2], [1, 2, 2], [1, 1, 2, 2, 3]]:
                 continue
                 
             if scratch_interval:
